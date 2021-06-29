@@ -14,6 +14,8 @@ namespace DoAn6KPI.Controllers
 	public class ThongKeController : ControllerBase
 	{
 		private readonly DoAnTNKPIContext _context;
+		private List<int> listTarget = new List<int>();
+		private List<int> listProgress = new List<int>();
 
 		public ThongKeController(DoAnTNKPIContext context)
 		{
@@ -27,17 +29,36 @@ namespace DoAn6KPI.Controllers
 			return kpioftime;
 		}
 		[HttpGet]
-		[Route("sumkpioftime/{idKPI}/{month}")]
-		public int getSumKpiOfMonth(int idKPI, int month)
+		[Route("sumkpioftimeTarget")]
+		public List<int> getSumlistTarget()
 		{
-			var kpioftime = _context.Progresslists.Where(i => i.Idkpi == idKPI).Where(x => x.Starttime.Month == month).Sum(y => y.Idkpi);
-			return kpioftime;
+			for(int i=1;i<=12;i++)
+			{
+				var kpiof = _context.Targetlists.Where(x => x.Starttime.Month == i).Select(a => a.Idtarget).Count();
+				listTarget.Add(kpiof);
+			}
+			List<int> list2 = new List<int>();
+			list2.AddRange(listTarget);
+			return list2;
+		}
+		[HttpGet]
+		[Route("sumkpioftimeprogress")]
+		public List<int> getSumlistprogress()
+		{
+			for (int i = 1; i <= 12; i++)
+			{
+				var kpiof = _context.Progresslists.Where(x => x.Starttime.Month == i).Select(a => a.Idprogress).Count();
+				listProgress.Add(kpiof);
+			}
+			List<int> list3 = new List<int>();
+			list3.AddRange(listProgress);
+			return list3;
 		}
 		[HttpGet]
 		[Route("kpioftime/{idKPI}/{year}")]
-		public async Task<List<Progresslist>> getKpiOfTime(int idKPI, int year)
+		public async Task<List<Targetlist>> getKpiOfTime(int idKPI, int year)
 		{
-			var kpioftime = await _context.Progresslists.Where(x => x.Idkpi == idKPI).Where(y => y.Starttime.Year == year).ToListAsync();
+			var kpioftime = await _context.Targetlists.Where(x => x.Idkpi == idKPI).Where(y => y.Starttime.Year == year).ToListAsync();
 			return kpioftime;
 		}
 		[HttpGet]
